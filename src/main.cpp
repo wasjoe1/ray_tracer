@@ -4,13 +4,36 @@
 
 #include<iostream>
 
-color ray_color(const ray& r) {
-    // return color{0,0,0}; sets it all to black
+// Add intersection at sphere, then return red color
+bool hit_sphere(const point3& center, double radius, const ray& r) {
+    // just need center, radius & ray to know if hit sphere
+        // mainly we have C - P
+        // know that (C - P) . (P - C) = r^2
+        // P(t) = Q + td, where Q is the camera origin, d is the ray's direction, t is unknown variable that we are solving for
+        // expand everything & a, b c is using the equation: ax^2 + bx + c
+    vec3 oc = center - r.origin();
+    double a = dot(r.direction(), r.direction());
+    double b = -2.0 * dot(r.direction(), oc);
+    double c = dot(oc, oc) - radius * radius;
+    double discriminant = b * b - 4 * a * c;
+    // as long as discriminant more than equal to 0, that means there is possible values of t which allow ray to intersect with sphere
+    return (discriminant >= 0);
+}
 
+color ray_color(const ray& r) {
+    // check if hit sphere first
+    if (hit_sphere(point3{0,0,-1}, 0.5, r)) { // hard coded radius, hard coded center
+        return color(1,0,0); // return red color
+    }
+
+    // else just make background (light blue)
     // creating a lerp between 2 values => linear blend OR linear interpolation
     vec3 unit_direction = unit_vector(r.direction());
     double a = 0.5 * (unit_direction.y() + 1);  // because the values can go negative && u want it to be within
+
+    // TODO: DEBUGGING
     if (unit_direction.y() > 0.5) {
+        // breakpoint 
         std::clog << unit_direction.y() << '\n';
     }
     
