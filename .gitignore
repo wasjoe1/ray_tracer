@@ -9,5 +9,12 @@ cmake-build*/
 .cache/
 .vscode/
 
+# ignore drafts
+drafts/
+
+# mac stuff
+.DS_store
+
 # ignore assets
 assets/
+image.ppm
