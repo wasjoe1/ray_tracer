@@ -61,6 +61,7 @@ public:
 };
 
 // point3 is just alias for vec3 (point3 is basically vec3)
+// declared here because multiple header files might use the point3 class => compared to color which is just used in color.h
 using point3 = vec3;
 
 // 2 things happening in the lines below:
