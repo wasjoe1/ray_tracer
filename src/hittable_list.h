@@ -31,6 +31,8 @@ public:
                 record = temp_record;
             }
         }
+
+        return hit_anything;
     }
 };
 

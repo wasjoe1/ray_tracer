@@ -7,4 +7,5 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 # create executable
-add_executable(RayTracer src/main.cpp src/color.cpp) # compiles both the main.cpp & color.cpp & links them into 1 executable RayTracer
+# add_executable(RayTracer src/main.cpp src/color.cpp) # compiles both the main.cpp & color.cpp & links them into 1 executable RayTracer
+add_executable(RayTracer src/main.cpp)
