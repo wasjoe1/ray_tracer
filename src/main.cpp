@@ -28,37 +28,18 @@
 // }
 
 color ray_color(const ray& ray, const hittable& world) {
+    // hit
     hit_record record;
     if (world.hit(ray, 0, inifinity, record)) {
         return 0.5 * (record.normal + color{1,1,1});
     }
-    
-    // create circle
-    point3 circle_center = point3{0, 0, -1};
-    double circle_radius = 0.5;
-
-    // check if hit sphere first => if negative value, then not hit [FOR NOW]
-    double t = get_t(circle_center, circle_radius, ray);
 
     // didnt hit
-    if (t < 0.0) {
-        // else: just make background (light blue)
-        // creating a lerp between 2 values => linear blend OR linear interpolation
-        vec3 unit_direction = unit_vector(ray.direction());
-        double a = 0.5 * (unit_direction.y() + 1);  // because the values can go negative && u want it to be within
-        color white_color{1, 1, 1};
-        color blue_color(0.5, 0.7, 1.0);
-        return (1 - a) * white_color + a * blue_color;
-    }
-
-    // hit
-    // get the normal vector N = unit(P - C)
-    vec3 P = ray.at(t);
-    vec3 N = unit_vector(P - circle_center);
-    color N_color = 0.5 * color{N.x() + 1, N.y() + 1, N.z() + 1};;
-    return N_color;
-    // return color(1,0,0); // return red color
-    // return color based on mapping [-1,1] to [0,1] for all components
+    vec3 unit_direction = unit_vector(ray.direction());
+    double a = 0.5 * (unit_direction.y() + 1);  // because the values can go negative && u want it to be within
+    color white_color{1, 1, 1};
+    color blue_color(0.5, 0.7, 1.0);
+    return (1 - a) * white_color + a * blue_color;
 
     // TODO: DEBUGGING
     // if (unit_direction.y() > 0.5) {
@@ -77,6 +58,11 @@ int main() {
     // image height
     int image_height = int(image_width / aspect_ratio);
     image_height = image_height > 1 ? image_height : 1; // image_height if image_height > 1 else 1
+
+    // WORLD
+    hittable_list world;
+    world.add(make_shared<sphere>(point3{0, 0, -1}, 0.5));
+    world.add(make_shared<sphere>(point3{0,-100.5,-1}, 100));
 
     // CAMERA
     auto focal_length = 1.0;
@@ -122,7 +108,7 @@ int main() {
             // create ray
             ray ray{camera_center, ray_direction}; // could potentially make ray_direction a unit vector but this currently is just faster code for now
             // get the ray's color
-            color pixel_color = ray_color(ray);
+            color pixel_color = ray_color(ray, world); // include the world
             // paint the image
             write_color(std::cout, pixel_color);
         }
