@@ -11,7 +11,7 @@ public:
     sphere(const point3 center, double radius) : center{center}, radius{std::fmax(0, radius)} {}
 
     // hit => override hittable's hit method
-    bool hit(const ray& ray, double ray_tmin, double ray_tmax, hit_record& record) const override {
+    bool hit(const ray& ray, interval ray_t, hit_record& record) const override {
         // const function => hit method should not alter the sphere, should just return the point of hitting
         // override from parent class
 
@@ -34,13 +34,24 @@ public:
             // cpp evaluates expression from left to right
             // (ray_tmin < root) will return 0 or 1 first
             // then compare it to ray_tmax
-        if (root <= ray_tmin || ray_tmax <= root) {
-            // minus not in range => check positive
+
+        // new version (use interval):
+            // this ray_t is between min & closest so far
+        if (!ray_t.surrounds(root)) {
             double root = (h + sqrt_discriminant) / a;
-            if (root <= ray_tmin || ray_tmax <= root) {
+            if (!ray_t.surrounds(root)) {
                 return false; // doesnt exist
             }
         }
+        
+        // old version:
+        // if (root <= ray_tmin || ray_tmax <= root) {
+        //     // minus not in range => check positive
+        //     double root = (h + sqrt_discriminant) / a;
+        //     if (root <= ray_tmin || ray_tmax <= root) {
+        //         return false; // doesnt exist
+        //     }
+        // }
 
         // root exists => set record
         record.t = root;

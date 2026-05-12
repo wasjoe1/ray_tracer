@@ -29,7 +29,7 @@ public:
      * @param ray_tmin
      * @param record Contains t (exact distance where the crash happened) & p (exact point of crash) & normal (direction of surface at exact spot)
      */
-    virtual bool hit(const ray& ray, double ray_tmin, double ray_tmax, hit_record& record) const = 0;
+    virtual bool hit(const ray& ray, interval ray_t, hit_record& record) const = 0;
     // = 0 mean? => abstract method
     // const => method that doesnt change the hittable object?
 };

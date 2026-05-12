@@ -18,14 +18,19 @@ public:
         objects.push_back(object);
     }
 
-    bool hit(const ray& ray, double ray_tmin, double ray_tmax, hit_record& record) const override {
+    bool hit(const ray& ray, interval ray_t, hit_record& record) const override {
         hit_record temp_record;
         bool hit_anything = false;
-        double closest_so_far = ray_tmax;
+        double closest_so_far = ray_t.max;
 
         // assign an auto type for the object => will follow what the list of parent pointers provided though
+        // for all the objects,
+            // we check if it hits within the ray we shot from min (set to 0) and the closest object so far
+            // if it hits, we shift the min
+            // else we continue findining
+            // if nothing found, we return false
         for (const auto& object : objects) {
-            if (object->hit(ray, ray_tmin, closest_so_far, temp_record)) {
+            if (object->hit(ray, interval(ray_t.min, closest_so_far), temp_record)) {                
                 hit_anything = true; // we did hit
                 closest_so_far = temp_record.t;
                 record = temp_record;
