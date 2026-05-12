@@ -1,0 +1,7 @@
+CompileFlags:
+  CompilationDatabase: build/
+  # line was added for .clangd to find compile_commands.json -- BUT .clangd already found it actually, so there was no point including this
+  # Add: [-I, /Users/joechua/Desktop/DEV/projects_for_fun/cpp_ray_tracer/cpp_ray_tracer/src]
+
+  # added specifically for ray tracer project as the author used a "God header", leading to lots of syntax misreads
+  Add: [-include, /Users/joechua/Desktop/DEV/projects_for_fun/cpp_ray_tracer/cpp_ray_tracer/src/raytracer_common.h]
