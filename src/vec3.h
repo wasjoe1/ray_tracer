@@ -14,32 +14,32 @@ public:
     double y() const { return e[1]; }
     double z() const { return e[2]; }
 
-    // const vec3 v;
-    double operator[](int i) const { return e[i]; } // this means u return a copy of the value in the array memory in the obj
-    // vec3 v;
-    double& operator[](int i) { return e[i]; } // this means u return a reference to the array memory in the obj
+    // const vec3 v; => copy-ed value returned
+    double operator[](int i) const { return e[i]; }
+    // vec3 v; => reference returned
+    double& operator[](int i) { return e[i]; }
 
     // "Arithmetic" operations
     // -vec
     vec3 operator-() const { return vec3(-e[0], -e[1], -e[2]); }
     // vec += vec2
     vec3& operator+=(const vec3& v) {
-        // vector v passed in should not be changed, hence const
         e[0] += v.e[0];
         e[1] += v.e[1];
         e[2] += v.e[2];
-        return *this; // return a reference to the obj
+        // return a reference to the obj
+        return *this;
     }
     // vec *= vec2
     vec3& operator*=(double t) {
         e[0] *= t;
         e[1] *= t;
         e[2] *= t;
-        return *this; // return a reference to the obj
+        return *this;
     }
     // vec /= vec2
     vec3& operator/=(double t) {
-        return *this *= 1/t; // just multiply everythign by 1/t
+        return *this *= 1/t;
     }
 
     // length
@@ -47,7 +47,8 @@ public:
         return e[0]*e[0] + e[1]*e[1] + e[2]*e[2];
     }
     double length() const {
-        return std::sqrt(length_squared()); // euclidean length (L2 norm)
+        // euclidean length (L2 norm)
+        return std::sqrt(length_squared());
     }
 };
 
@@ -55,7 +56,8 @@ using point3 = vec3;
 
 // ostream
 inline std::ostream& operator<<(std::ostream& out, const vec3& v) {
-    return out << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2]; // doesnt add \n
+    // dont add \n => let user decide
+    return out << v.e[0] << ' ' << v.e[1] << ' ' << v.e[2];
 }
 
 // + => image 5.0 + vec3 => 5.0 would not have the operator+ overloaded & will throw error

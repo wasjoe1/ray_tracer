@@ -5,14 +5,8 @@ class interval {
 public:
     // min & max
     double min, max;
-
-    // static - class member (variable / method)
-    // const - constant; not allowed to change
-    static const interval empty, universe; // pre-defined useful intervals
-
-    // own attempt: WRONG => refer to `CS_fundamentals/cpp/quick_notes.md` for more details why we cant do initialization here
-    // static const interval empty = interval{+infinity, -infinity};
-    // static const interval universe = interval{-infinity, +infinity};
+    // pre-defined useful intervals
+    static const interval empty, universe;
 
     // constructors
     interval() : min(+infinity), max(-infinity) {}
@@ -39,10 +33,7 @@ public:
     }
 };
 
-// definition below:
 const interval interval::empty = interval{+infinity, -infinity};
 const interval interval::universe = interval{-infinity, +infinity};
-// note that this potentially causes linker error if we include the header in multiple TUs
-// but we only 1 TU so it doesnt cause linker error
 
 #endif
