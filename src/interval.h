@@ -31,6 +31,13 @@ public:
     bool surrounds(double x) const {
         return !(x <= min || x >= max);
     }
+
+    double clamp(double x) const {
+        if (x > max) return max;
+        if (x < min) return min;
+        return x;
+    }
+
 };
 
 const interval interval::empty = interval{+infinity, -infinity};
