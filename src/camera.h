@@ -3,6 +3,9 @@
 
 #include "color.h"
 #include "hittable.h"
+#include "vec3.h"
+
+#include "material.h" // camera is technically the "biggest" header for main.cpp
 
 class camera {
 public:
@@ -11,6 +14,7 @@ public:
     double aspect_ratio = 1.0;
     int image_width = 100;
     int samples_per_pixel = 10; // number of random samples for each pixel (default=10)
+    int max_depth = 10; // max num of ray bounces into scene
     
     void render(const hittable& world) {
         // called first to commit values for render
@@ -26,7 +30,7 @@ public:
                 for (int sample = 0; sample < samples_per_pixel; sample++) {
                     // accumulate all the colors of random samples
                     ray r = get_ray(i, j); // get random ray for the current (i, j) pixel
-                    pixel_color += ray_color(r, world);
+                    pixel_color += ray_color(r, max_depth, world); // add max_depth to ensure recursion doesnt EXPLODE
                 }
                 write_color(std::cout, pixel_color * pixel_samples_scale);
 
@@ -90,15 +94,37 @@ private:
     }
 
     // moved from main.cpp
-    color ray_color(const ray& ray, const hittable& world) const {
+    color ray_color(const ray& r, int depth, const hittable& world) const {
+
+        // check depth
+        if (depth <= 0) {
+            return color(0.0,0.0,0.0); // no value added (no color basically )
+        }
+
         // hit
         hit_record record;
-        if (world.hit(ray, interval(0, infinity), record)) {
-            return 0.5 * (record.normal + color{1,1,1});
+        // set interval to 0.001 instead of 0 to ignore very small values when hitting a surface
+        if (world.hit(r, interval(0.001, infinity), record)) {
+            // old: randomly scatter rays => hence very rough sphere
+            // vec3 direction = record.normal + random_unit_vector();
+            // return 0.5 * ray_color(ray(record.p, direction), depth - 1, world);
+
+            // new: hit on hittable's material
+            ray scattered;
+            color attenuation;
+            // if the hittable material is not default (only the parent's material returns false & doesnt scatter)
+            // we use record's material because it hits a different material at every different record
+            if (record.mat->scatter(r, record, attenuation, scattered)) {
+                // place the scattered ray 
+                return attenuation * ray_color(scattered, depth-1, world);
+            }
+
+            // else just return 0 color at the end
+            return color(0.0, 0.0, 0.0);
         }
 
         // didnt hit
-        vec3 unit_direction = unit_vector(ray.direction());
+        vec3 unit_direction = unit_vector(r.direction());
         double a = 0.5 * (unit_direction.y() + 1);
         color white_color{1.0, 1.0, 1.0};
         color blue_color(0.5, 0.7, 1.0);

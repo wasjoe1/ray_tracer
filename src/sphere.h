@@ -8,7 +8,9 @@
 class sphere : public hittable {
 public:
     // constructor
-    sphere(const point3 center, double radius) : center{center}, radius{std::fmax(0, radius)} {}
+    sphere(const point3 center, double radius, shared_ptr<material> mat) : center{center}, radius{std::fmax(0, radius)}, mat{mat} {
+        // TODO: init material pointer mat WHEN creating the sphere in the 3D scene
+    }
 
     // hit
     bool hit(const ray& ray, interval ray_t, hit_record& record) const override {
@@ -26,7 +28,7 @@ public:
         // if yes real soln
         double sqrt_discriminant = std::sqrt(discriminant);
         // find nearest root => check minus first
-        double root = (h - sqrt_discriminant) / a;
+        double root = (h - sqrt_discriminant) / a; // potential ERROR: if ray direction was 0, a will be 0; bad divide by 0 occurs here
 
         if (!ray_t.surrounds(root)) {
             double root = (h + sqrt_discriminant) / a;
@@ -39,6 +41,7 @@ public:
         // root exists => set record
         record.t = root;
         record.p = ray.at(root);
+        record.mat = mat; // record stores the material of sphere
 
         // add surface side determination => during hit calculation
         vec3 unit_outward_normal = (record.p - center) / radius;
@@ -50,6 +53,7 @@ public:
 private:
     point3 center;
     double radius;
+    shared_ptr<material> mat; // material of the sphere
 };
 
 #endif

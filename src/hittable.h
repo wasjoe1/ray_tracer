@@ -1,10 +1,16 @@
 #ifndef HITTABLE_H
 #define HITTABLE_H
 
+// forward delcaration
+    // cpp has no class hoisting
+    // forward declares the class so that current header can use it first & tells compiler to trust that definition will be provided later on
+class material;
+
 class hit_record {
 public:
     point3 p;
     vec3 normal;
+    shared_ptr<material> mat; // forward declared
     double t;
     bool front_face;
 
