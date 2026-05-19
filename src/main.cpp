@@ -19,12 +19,21 @@ int main() {
     // shared_ptr<metal> material_right = make_shared<metal>(color(0.8, 0.6, 0.2));
 
     // fuzzy metal
-    shared_ptr<metal> material_left   = make_shared<metal>(color(0.8, 0.8, 0.8), 0.3); // not very fuzzy (observe that its still pretty reflective)
-    shared_ptr<metal> material_right  = make_shared<metal>(color(0.8, 0.6, 0.2), 1.0); // very fuzzy
+    // shared_ptr<metal> material_left = make_shared<metal>(color(0.8, 0.8, 0.8), 0.3); // not very fuzzy (observe that its still pretty reflective)
+    shared_ptr<metal> material_right = make_shared<metal>(color(0.8, 0.6, 0.2), 1.0); // very fuzzy
+
+    // refracted v1 => only need refractive index
+    // shared_ptr<dielectric> material_left = make_shared<dielectric>(1.5);
+    // refracted v2
+    // shared_ptr<dielectric> material_left = make_shared<dielectric>(1.00 / 1.33);
+    // refracted v3
+    shared_ptr<dielectric> material_left = make_shared<dielectric>(1.50);
+    shared_ptr<dielectric> material_bubble = make_shared<dielectric>(1.0 / 1.50);
 
     world.add(make_shared<sphere>(point3{0.0,-100.5,-1.0}, 100.0, material_ground));
     world.add(make_shared<sphere>(point3{0.0, 0.0, -1.2}, 0.5, material_center));
     world.add(make_shared<sphere>(point3{-1.0, 0.0, -1.0}, 0.5, material_left));
+    world.add(make_shared<sphere>(point3{-1.0, 0.0, -1.0}, 0.4, material_bubble));
     world.add(make_shared<sphere>(point3{1.0, 0.0, -1.0}, 0.5, material_right));
 
     // CAMERA

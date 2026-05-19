@@ -62,4 +62,43 @@ private:
     double fuzz; // cant be more 1
 };
 
+class dielectric : public material {
+public:
+    dielectric(double m_refraction_index) : m_refraction_index(m_refraction_index) {}
+
+    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const override {
+        // reminder: final color = incoming color * attenuation => attenuation is how much light is absorbed or reflected
+        attenuation = color{1.0, 1.0, 1.0};
+        double ri = rec.front_face ? (1.0 / m_refraction_index) : m_refraction_index;
+
+        vec3 unit_direction = unit_vector(r_in.direction());
+
+        // v1: use the r_in ray, normal vector & refractive index to determine the refracted vector
+        // vec3 refracted = refract(unit_direction, rec.normal, ri);
+        // create the refracted ray from the point of intersection
+        // scattered = ray(rec.p, refracted);
+
+        double cos_theta = std::fmin(dot(-unit_direction, rec.normal), 1.0);
+        double sin_theta = std::sqrt(1.0 - cos_theta*cos_theta);
+
+        bool is_reflect = (ri * sin_theta > 1.0) || (reflectance(cos_theta, ri) > random_double());
+        vec3 direction;
+
+        direction = is_reflect ? reflect(unit_direction, rec.normal) : refract(unit_direction, rec.normal, ri);
+        scattered = ray(rec.p, direction);
+        
+        return true;
+    }
+
+private:
+    double m_refraction_index;
+
+    static double reflectance(double cosine, double refraction_index) {
+        // note that the refraction_index used here cant take in non-static variables
+        double r0 = (1 - refraction_index) / (1 + refraction_index);
+        r0 = r0 * r0;
+        return r0 + (1-r0) * std::pow((1-cosine), 5);
+    }
+};
+
 #endif

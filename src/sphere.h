@@ -31,7 +31,7 @@ public:
         double root = (h - sqrt_discriminant) / a; // potential ERROR: if ray direction was 0, a will be 0; bad divide by 0 occurs here
 
         if (!ray_t.surrounds(root)) {
-            double root = (h + sqrt_discriminant) / a;
+            root = (h + sqrt_discriminant) / a;
             if (!ray_t.surrounds(root)) {
                 // doesnt exist
                 return false;
