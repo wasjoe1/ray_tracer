@@ -10,32 +10,30 @@ int main() {
     // WORLD
     hittable_list world;
 
+
     // OBJECTS
+    // v2: zoomed out view
     shared_ptr<lambertian> material_ground = make_shared<lambertian>(color(0.8, 0.8, 0.0));
     shared_ptr<lambertian> material_center = make_shared<lambertian>(color(0.1, 0.2, 0.5));
-
-    // non-fuzzy metal
-    // shared_ptr<metal> material_left = make_shared<metal>(color(0.8, 0.8, 0.8));
-    // shared_ptr<metal> material_right = make_shared<metal>(color(0.8, 0.6, 0.2));
-
-    // fuzzy metal
-    // shared_ptr<metal> material_left = make_shared<metal>(color(0.8, 0.8, 0.8), 0.3); // not very fuzzy (observe that its still pretty reflective)
     shared_ptr<metal> material_right = make_shared<metal>(color(0.8, 0.6, 0.2), 1.0); // very fuzzy
-
-    // refracted v1 => only need refractive index
-    // shared_ptr<dielectric> material_left = make_shared<dielectric>(1.5);
-    // refracted v2
-    // shared_ptr<dielectric> material_left = make_shared<dielectric>(1.00 / 1.33);
-    // refracted v3
     shared_ptr<dielectric> material_left = make_shared<dielectric>(1.50);
     shared_ptr<dielectric> material_bubble = make_shared<dielectric>(1.0 / 1.50);
-
+    
     world.add(make_shared<sphere>(point3{0.0,-100.5,-1.0}, 100.0, material_ground));
     world.add(make_shared<sphere>(point3{0.0, 0.0, -1.2}, 0.5, material_center));
-    world.add(make_shared<sphere>(point3{-1.0, 0.0, -1.0}, 0.5, material_left));
     world.add(make_shared<sphere>(point3{-1.0, 0.0, -1.0}, 0.4, material_bubble));
+    world.add(make_shared<sphere>(point3{-1.0, 0.0, -1.0}, 0.5, material_left));
     world.add(make_shared<sphere>(point3{1.0, 0.0, -1.0}, 0.5, material_right));
 
+    // V1: Wide angle camera
+    // double R = std::cos(pi / 4);
+
+    // shared_ptr<lambertian> material_left = make_shared<lambertian>(color(0.0, 0.0, 1.0));
+    // shared_ptr<lambertian> material_right = make_shared<lambertian>(color(1.0, 0.0, 0.0));
+
+    // world.add(make_shared<sphere>(point3{-R, 0.0, -1.0}, R, material_left));
+    // world.add(make_shared<sphere>(point3{R, 0.0, -1.0}, R, material_right));
+    
     // CAMERA
     camera cam;
 
@@ -45,6 +43,15 @@ int main() {
     cam.samples_per_pixel = 100;
     cam.max_depth = 50;
 
+    // distant view
+    // cam.vfov = 90;
+    cam.lookfrom = point3(-2.0, 2.0, 1.0);
+    cam.lookat = point3(0.0, 0.0, -1.0);
+    cam.vup = point3(0.0, 1.0, 0.0);
+
+    // zoom in
+    cam.vfov = 20;
+    
     // render()
     cam.render(world);
 }

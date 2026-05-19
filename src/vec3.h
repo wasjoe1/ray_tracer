@@ -1,6 +1,7 @@
 #ifndef VEC3_H
 #define VEC3_H
 
+#include "raytracer_common.h"
 class vec3 {
 public:
     double e[3];
@@ -158,6 +159,13 @@ inline vec3 refract(const vec3& uv, const vec3& n, double etai_over_etat) {
     vec3 r_out_prep = etai_over_etat * (uv + cos_theta * n);
     vec3 r_out_parallel = -std::sqrt(std::fabs(1.0 - r_out_prep.length_squared())) * n;
     return r_out_parallel + r_out_prep;
+}
+
+inline vec3 random_in_unit_disk() {
+    while (true) {
+        vec3 p = vec3(random_double(-1.0, 1), random_double(-1.0, 1), 0.0);
+        if (p.length_squared() < 1) { return p; }
+    }
 }
 
 #endif
