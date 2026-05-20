@@ -51,6 +51,10 @@ int main() {
 
     // zoom in
     cam.vfov = 20;
+
+    // set depth of field
+    cam.defocus_angle = 10.0;
+    cam.focus_distance = 3.4;
     
     // render()
     cam.render(world);
