@@ -42,20 +42,27 @@ cmake --build build
 ```
 cpp_ray_tracer/
 ├── src/
-│   ├── raytracer_common.h   shared includes, constants (pi, infinity), random_double()
-│   ├── vec3.h               vec3 / point3 type, math ops, refract(), random helpers
-│   ├── color.h              color alias, write_color(), gamma correction
-│   ├── ray.h                ray struct (origin + direction)
-│   ├── interval.h           interval struct (min/max, surrounds, clamp)
-│   ├── hittable.h           hittable abstract base class + hit_record
-│   ├── hittable_list.h      scene container (list of hittables)
-│   ├── sphere.h             sphere : hittable
-│   ├── material.h           material base class + lambertian, metal, dielectric
-│   ├── camera.h             camera setup, render loop, ray_color()
-│   └── main.cpp             entry point — scene setup for each chapter
-├── renders/                 selected renders saved from key stages of the project
-├── CMakeLists.txt           build target definition
-└── CMakePresets.json        configure preset (Ninja generator + vcpkg toolchain)
+│   ├── raytracer_common.h      shared includes, constants (pi, infinity), random_double()
+│   ├── vec3.h                  vec3 / point3 type, math ops, refract(), random helpers
+│   ├── color.h                 color alias, write_color(), gamma correction
+│   ├── ray.h                   ray struct (origin + direction)
+│   ├── interval.h              interval struct (min/max, surrounds, clamp)
+│   ├── hittable.h              hittable abstract base class + hit_record
+│   ├── hittable_list.h         scene container (list of hittables)
+│   ├── sphere.h                sphere : hittable
+│   ├── material.h              material base class + lambertian, metal, dielectric
+│   ├── camera.h                camera setup, render loop, ray_color()
+│   └── main.cpp                entry point — scene setup for each chapter
+├── notes/
+│   ├── chapters/               per-chapter markdown notes
+│   └── todos.md                outstanding tasks and ideas
+├── renders/                    selected renders saved from key stages of the project
+├── CMakeLists.txt              build target definition
+├── CMakePresets.json           configure preset (Ninja generator + vcpkg toolchain)
+├── vcpkg.json                  vcpkg manifest (dependency list)
+├── vcpkg-configuration.json    vcpkg registry and baseline config
+├── .clangd                     language server config (include paths, flags)
+└── .clang-format               code style rules
 ```
 
 ## Missing concepts in this text book

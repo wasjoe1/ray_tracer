@@ -6,7 +6,7 @@ DONE
 - chapter 14: final render
     => copy over the code
     => clean code
-    => write README, learnings & whats next for me (refer to the top 4 points)
+    => write README, learnings & whats next for me (refer to the section `missing concepts in this text book` in the readme)
 - chapter 13: defocus blur
 - chapter 12: positionable camera
 - chapter 11: dielectrics
