@@ -1,20 +1,15 @@
-# to ignore CMake build directories
+# ignore build directories
 build/
-cmake-build*/
 
-# to ignore .clang-format => NO! actually prevents formatting wars!
-# .clang-format
-
-# ignore any cached files
+# ignore cached files
 .cache/
 .vscode/
 
 # ignore drafts
 drafts/
 
-# mac stuff
+# ignore mac stuff
 .DS_store
 
 # ignore assets
-assets/
 image.ppm

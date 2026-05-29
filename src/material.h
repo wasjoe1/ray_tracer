@@ -9,12 +9,7 @@ class material {
 public:
     virtual ~material() = default;
 
-    // =0 - pure virtual method
-    // virtual bool scatter(...) const = 0;
-
-    // default method
     virtual bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered) const {
-        // default is to return false;
         return false;
     }
 };
@@ -27,7 +22,6 @@ public:
     bool scatter(const ray& r_in, const hit_record& record, color& attenuation, ray& scattered) const override {
         vec3 scatter_direction = record.normal + random_unit_vector();
 
-        // accounts for 0 unit vectors which might cause NaN & inf errors
         if (scatter_direction.near_zero()) {
             scatter_direction = record.normal;
         }
@@ -48,10 +42,7 @@ public:
 
     bool scatter(const ray& r_in, const hit_record& record, color& attenuation, ray& scattered) const override {
         vec3 reflected = reflect(r_in.direction(), record.normal);
-
-        // make it fuzzy => just deflect it abit using a random_unit vector
         reflected = unit_vector(reflected) + (fuzz * random_unit_vector());
-
         scattered = ray(record.p, reflected);
         attenuation = albedo;
         return true;
@@ -59,10 +50,10 @@ public:
 
 private:
     color albedo;
-    // cant be more than 1
     double fuzz;
 };
 
+// child 3: dielectric material
 class dielectric : public material {
 public:
     dielectric(double m_refraction_index) : m_refraction_index(m_refraction_index) {}

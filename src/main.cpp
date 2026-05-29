@@ -7,55 +7,118 @@
 #include "sphere.h"
 
 int main() {
-    // WORLD
     hittable_list world;
 
+    shared_ptr<lambertian> ground_material = make_shared<lambertian>(color(0.5, 0.5, 0.5));
+    world.add(make_shared<sphere>(point3(0, -1000, 0), 1000, ground_material));
 
-    // OBJECTS
-    // v2: zoomed out view
-    shared_ptr<lambertian> material_ground = make_shared<lambertian>(color(0.8, 0.8, 0.0));
-    shared_ptr<lambertian> material_center = make_shared<lambertian>(color(0.1, 0.2, 0.5));
-    shared_ptr<metal> material_right = make_shared<metal>(color(0.8, 0.6, 0.2), 1.0); // very fuzzy
-    shared_ptr<dielectric> material_left = make_shared<dielectric>(1.50);
-    shared_ptr<dielectric> material_bubble = make_shared<dielectric>(1.0 / 1.50);
-    
-    world.add(make_shared<sphere>(point3{0.0,-100.5,-1.0}, 100.0, material_ground));
-    world.add(make_shared<sphere>(point3{0.0, 0.0, -1.2}, 0.5, material_center));
-    world.add(make_shared<sphere>(point3{-1.0, 0.0, -1.0}, 0.4, material_bubble));
-    world.add(make_shared<sphere>(point3{-1.0, 0.0, -1.0}, 0.5, material_left));
-    world.add(make_shared<sphere>(point3{1.0, 0.0, -1.0}, 0.5, material_right));
+    // Many small random balls
+    for (int a = -11; a < 11; a++) {
+        for (int b = -11; b < 11; b++) {
+            double choose_mat = random_double();
+            point3 center(a + 0.9*random_double(), 0.2, b + 0.9*random_double());
 
-    // V1: Wide angle camera
-    // double R = std::cos(pi / 4);
+            // Skip positions that would overlap with the 3 main spheres
+            if ((center - point3(-4, 0.2, 0)).length() < 1.0) continue;
+            if ((center - point3( 4, 0.2, 0)).length() < 1.0) continue;
+            if ((center - point3( 0, 0.2,-5)).length() < 1.0) continue;
 
-    // shared_ptr<lambertian> material_left = make_shared<lambertian>(color(0.0, 0.0, 1.0));
-    // shared_ptr<lambertian> material_right = make_shared<lambertian>(color(1.0, 0.0, 0.0));
+            shared_ptr<material> mat;
+            if (choose_mat < 0.8) {
+                auto albedo = color::random() * color::random();
+                mat = make_shared<lambertian>(albedo);
+            } else if (choose_mat < 0.95) {
+                auto albedo = color::random(0.5, 1);
+                auto fuzz = random_double(0, 0.5);
+                mat = make_shared<metal>(albedo, fuzz);
+            } else {
+                mat = make_shared<dielectric>(1.5);
+            }
+            world.add(make_shared<sphere>(center, 0.2, mat));
+        }
+    }
 
-    // world.add(make_shared<sphere>(point3{-R, 0.0, -1.0}, R, material_left));
-    // world.add(make_shared<sphere>(point3{R, 0.0, -1.0}, R, material_right));
-    
-    // CAMERA
+    // 3 main spheres (pushed around so they frame the letters)
+    world.add(make_shared<sphere>(point3( 0, 1, -5), 1.0, make_shared<dielectric>(1.5)));
+    world.add(make_shared<sphere>(point3(-4, 1,  0), 1.0, make_shared<lambertian>(color(0.4, 0.2, 0.1))));
+    world.add(make_shared<sphere>(point3( 4, 1,  0), 1.0, make_shared<metal>(color(0.7, 0.6, 0.5), 0.0)));
+
+    // ── "JOE" spelled in glass spheres ──────────────────────────────────────
+    // Grid: 3 columns × 7 rows per letter, radius r, spacing s between centres.
+    // One blank column separates consecutive letters.
+    // Letters are centred at x=0, sit on the ground (y_bottom = r), at z=0.
+    //
+    // Column x positions:
+    //   J: -1.50  -1.20  -0.90
+    //   O: -0.30   0.00   0.30
+    //   E:  0.90   1.20   1.50
+    //
+    // Row y positions (row 0 = bottom):
+    //   y = r + row * s
+    // ────────────────────────────────────────────────────────────────────────
+    auto glass = make_shared<dielectric>(1.5);
+    const double r = 0.12;
+    const double s = 0.30;
+
+    // Bitmaps: [row][col], row 0 = bottom, row 6 = top
+    int J[7][3] = {
+        {0, 1, 0},   // row 0: bottom of hook
+        {1, 0, 1},   // row 1: hook sides
+        {0, 0, 1},   // row 2
+        {0, 0, 1},   // row 3
+        {0, 0, 1},   // row 4
+        {0, 0, 1},   // row 5
+        {1, 1, 1},   // row 6: top bar
+    };
+    int O[7][3] = {
+        {0, 1, 0},   // row 0
+        {1, 0, 1},   // row 1
+        {1, 0, 1},   // row 2
+        {1, 0, 1},   // row 3
+        {1, 0, 1},   // row 4
+        {1, 0, 1},   // row 5
+        {0, 1, 0},   // row 6
+    };
+    int E[7][3] = {
+        {1, 1, 1},   // row 0: bottom bar
+        {1, 0, 0},   // row 1
+        {1, 0, 0},   // row 2
+        {1, 1, 0},   // row 3: middle bar (shorter, classic E)
+        {1, 0, 0},   // row 4
+        {1, 0, 0},   // row 5
+        {1, 1, 1},   // row 6: top bar
+    };
+
+    const double j_x0 = -1.50;
+    const double o_x0 = -0.30;
+    const double e_x0 =  0.90;
+
+    for (int row = 0; row < 7; row++) {
+        double y = r + row * s;
+        for (int col = 0; col < 3; col++) {
+            double dx = col * s;
+            if (J[row][col])
+                world.add(make_shared<sphere>(point3(j_x0 + dx, y, 0), r, glass));
+            if (O[row][col])
+                world.add(make_shared<sphere>(point3(o_x0 + dx, y, 0), r, glass));
+            if (E[row][col])
+                world.add(make_shared<sphere>(point3(e_x0 + dx, y, 0), r, glass));
+        }
+    }
+
     camera cam;
-
-    // initialize user values
+    
     cam.aspect_ratio = 16.0 / 9.0;
-    cam.image_width = 400;
-    cam.samples_per_pixel = 100;
+    cam.image_width = 1200;
+    cam.samples_per_pixel = 500;
     cam.max_depth = 50;
 
-    // distant view
-    // cam.vfov = 90;
-    cam.lookfrom = point3(-2.0, 2.0, 1.0);
-    cam.lookat = point3(0.0, 0.0, -1.0);
-    cam.vup = point3(0.0, 1.0, 0.0);
+    cam.vfov = 25;
+    cam.lookfrom = point3(0, 2, 10);
+    cam.lookat = point3(0, 1, 0);
+    cam.vup = point3(0, 1, 0);
+    cam.defocus_angle = 0.6;
+    cam.focus_distance = 10.0;
 
-    // zoom in
-    cam.vfov = 20;
-
-    // set depth of field
-    cam.defocus_angle = 10.0;
-    cam.focus_distance = 3.4;
-    
-    // render()
     cam.render(world);
 }
